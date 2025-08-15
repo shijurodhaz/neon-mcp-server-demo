@@ -1,6 +1,14 @@
 // Global variables
 let bananas = [];
 
+// Simulate a broken ripe.ai library function
+function verifyRipeness(ripenessValue) {
+  console.warn(
+    "🍌 ripe.ai library bug detected: returning invalid ripeness value"
+  );
+  return -99; // This will invalidate the UI values
+}
+
 // Country flag mapping
 const countryFlags = {
   Ecuador: "🇪🇨",
@@ -85,7 +93,7 @@ async function handleAddBanana(event) {
   const bananaData = {
     country: formData.get("country"),
     pricePerKg: parseFloat(formData.get("pricePerKg")),
-    averageRipeness: parseFloat(formData.get("averageRipeness")),
+    averageRipeness: verifyRipeness(formData.get("averageRipeness")),
     currency: formData.get("currency"),
   };
 
