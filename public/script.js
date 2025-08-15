@@ -23,6 +23,20 @@ const countryFlags = {
   Panama: "🇵🇦",
   Nicaragua: "🇳🇮",
   Venezuela: "🇻🇪",
+  Thailand: "🇹🇭",
+  Vietnam: "🇻🇳",
+  Indonesia: "🇮🇩",
+  Malaysia: "🇲🇾",
+  Singapore: "🇸🇬",
+  "South Korea": "🇰🇷",
+  Taiwan: "🇹🇼",
+  "New Zealand": "🇳🇿",
+  "South Africa": "🇿🇦",
+  Kenya: "🇰🇪",
+  Uganda: "🇺🇬",
+  Tanzania: "🇹🇿",
+  Ghana: "🇬🇭",
+  "Ivory Coast": "🇨🇮",
 };
 
 // Initialize the application
@@ -40,6 +54,11 @@ function setupEventListeners() {
 // Load bananas from API
 async function loadBananas() {
   try {
+    // Show loading state
+    const bananaList = document.getElementById("bananaList");
+    bananaList.innerHTML =
+      '<div class="loading">🍌 Loading banana data from Neon database...</div>';
+
     const response = await fetch("/api/bananas");
     if (!response.ok) {
       throw new Error("Failed to fetch bananas");
@@ -47,9 +66,14 @@ async function loadBananas() {
     bananas = await response.json();
     renderBananas();
     updateStats();
+
+    // Show success message for first load
+    if (bananas.length > 0) {
+      showSuccess(`🍌 Loaded ${bananas.length} countries from Neon database!`);
+    }
   } catch (error) {
     console.error("Error loading bananas:", error);
-    showError("Failed to load banana data");
+    showError("Failed to load banana data from database");
   }
 }
 
@@ -86,7 +110,7 @@ async function handleAddBanana(event) {
 
     // Reset form
     event.target.reset();
-    showSuccess("🍌 New country added to the Banana Index!");
+    showSuccess("🍌 New country added to the Neon database!");
   } catch (error) {
     console.error("Error adding banana:", error);
     showError(error.message);
@@ -144,16 +168,20 @@ function renderBananas() {
             <div class="banana-info">
                 <div class="info-item">
                     <div class="label">Price per kg</div>
-                    <div class="value">$${banana.pricePerKg.toFixed(2)}</div>
+                    <div class="value">$${parseFloat(banana.pricePerKg).toFixed(
+                      2
+                    )}</div>
                 </div>
                 <div class="info-item">
                     <div class="label">Ripeness</div>
-                    <div class="value">${banana.averageRipeness}/10</div>
+                    <div class="value">${parseFloat(
+                      banana.averageRipeness
+                    )}/10</div>
                 </div>
             </div>
             <div class="ripeness-bar">
                 <div class="ripeness-fill" style="width: ${
-                  (banana.averageRipeness / 10) * 100
+                  (parseFloat(banana.averageRipeness) / 10) * 100
                 }%"></div>
             </div>
             <div class="last-updated">Updated: ${banana.lastUpdated}</div>
@@ -173,11 +201,11 @@ function updateStats() {
 
   if (bananas.length > 0) {
     const totalPrice = bananas.reduce(
-      (sum, banana) => sum + banana.pricePerKg,
+      (sum, banana) => sum + parseFloat(banana.pricePerKg),
       0
     );
     const totalRipeness = bananas.reduce(
-      (sum, banana) => sum + banana.averageRipeness,
+      (sum, banana) => sum + parseFloat(banana.averageRipeness),
       0
     );
 

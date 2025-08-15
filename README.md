@@ -12,15 +12,6 @@ This application showcases how Neon's MCP Server can be used to:
 - **Modern Web Development**: Create responsive, interactive web applications
 - **Production-Ready Features**: Demonstrate Neon's enterprise-grade database features
 
-## Features
-
-- 🌍 **Global Banana Tracking**: View banana prices and ripeness from countries worldwide
-- 📊 **Real-time Statistics**: See average prices and ripeness across all countries
-- ➕ **Add New Countries**: Easily add new countries to the index
-- 🗑️ **Remove Countries**: Delete countries from the index
-- 🎨 **Beautiful UI**: Modern, responsive design with fun animations
-- 🚀 **In-Memory Storage**: Fast performance with in-memory data storage
-
 ## Tech Stack
 
 - **Backend**: Node.js with Express
@@ -67,6 +58,17 @@ To run in production mode:
 npm start
 ```
 
+## Database Integration
+
+📖 **For detailed database integration instructions, see [DATABASE_INTEGRATION.md](./DATABASE_INTEGRATION.md)**
+
+This application is designed to integrate with Neon's serverless Postgres database using Drizzle ORM. The integration includes:
+
+- **Drizzle Schema**: Type-safe database schema definition
+- **Database Configuration**: Neon connection setup
+- **Migration Management**: Safe schema changes and data migration
+- **Query Optimization**: Performance monitoring and optimization tools
+
 ## API Endpoints
 
 The application provides a RESTful API for managing banana data:
@@ -93,57 +95,6 @@ curl -X POST http://localhost:3000/api/bananas \
     "currency": "USD"
   }'
 ```
-
-## Data Structure
-
-Each country entry contains:
-
-```json
-{
-  "id": 1,
-  "country": "Ecuador",
-  "pricePerKg": 1.2,
-  "averageRipeness": 7.5,
-  "currency": "USD",
-  "lastUpdated": "2024-01-15"
-}
-```
-
-## Neon MCP Server Integration
-
-This demo is designed to showcase Neon's MCP Server capabilities. The current version uses in-memory storage, but it's structured to easily integrate with Neon's serverless Postgres database through the MCP Server.
-
-### Planned Neon Features:
-
-- [ ] **Database Migration**: Use Neon's MCP Server to create and manage database schemas
-- [ ] **Real-time Queries**: Leverage Neon's branching for development and testing
-- [ ] **Connection Management**: Utilize Neon's connection pooling and serverless scaling
-- [ ] **Data Persistence**: Store banana index data in Neon's Postgres database
-- [ ] **Performance Optimization**: Use Neon's query tuning and optimization features
-- [ ] **Backup & Recovery**: Demonstrate Neon's automatic backups and point-in-time recovery
-
-## Future Enhancements
-
-- [ ] User authentication with Neon Auth
-- [ ] Historical price tracking with time-series data
-- [ ] Price alerts and notifications
-- [ ] Export functionality
-- [ ] Mobile app
-- [ ] Real-time price updates
-- [ ] Currency conversion
-- [ ] Seasonal price analysis
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Fun Facts
 

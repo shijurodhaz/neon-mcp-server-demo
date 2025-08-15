@@ -1,6 +1,13 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
+import express from "express";
+import cors from "cors";
+import path from "path";
+import { db, bananaIndex } from "./db.js";
+import { eq } from "drizzle-orm";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,58 +17,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
-// In-memory storage for banana data
-let bananaIndex = [
-  {
-    id: 1,
-    country: "Ecuador",
-    pricePerKg: 1.2,
-    averageRipeness: 7.5,
-    currency: "USD",
-    lastUpdated: "2024-01-15",
-  },
-  {
-    id: 2,
-    country: "Philippines",
-    pricePerKg: 0.85,
-    averageRipeness: 6.8,
-    currency: "USD",
-    lastUpdated: "2024-01-14",
-  },
-  {
-    id: 3,
-    country: "Costa Rica",
-    pricePerKg: 1.45,
-    averageRipeness: 8.2,
-    currency: "USD",
-    lastUpdated: "2024-01-13",
-  },
-  {
-    id: 4,
-    country: "India",
-    pricePerKg: 0.65,
-    averageRipeness: 6.5,
-    currency: "USD",
-    lastUpdated: "2024-01-12",
-  },
-  {
-    id: 5,
-    country: "Brazil",
-    pricePerKg: 1.1,
-    averageRipeness: 7.8,
-    currency: "USD",
-    lastUpdated: "2024-01-11",
-  },
-];
-
-let nextId = 6;
-
 // API Routes
-app.get("/api/bananas", (req, res) => {
-  res.json(bananaIndex);
+app.get("/api/bananas", async (req, res) => {
+  try {
+    const bananas = await db.select().from(bananaIndex);
+    res.json(bananas);
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({ error: "Database error" });
+  }
 });
 
-app.post("/api/bananas", (req, res) => {
+app.post("/api/bananas", async (req, res) => {
   const { country, pricePerKg, averageRipeness, currency = "USD" } = req.body;
 
   if (!country || !pricePerKg || !averageRipeness) {
@@ -70,58 +37,87 @@ app.post("/api/bananas", (req, res) => {
     });
   }
 
-  const newBanana = {
-    id: nextId++,
-    country,
-    pricePerKg: parseFloat(pricePerKg),
-    averageRipeness: parseFloat(averageRipeness),
-    currency,
-    lastUpdated: new Date().toISOString().split("T")[0],
-  };
+  try {
+    const newBanana = await db
+      .insert(bananaIndex)
+      .values({
+        country,
+        pricePerKg: parseFloat(pricePerKg),
+        averageRipeness: parseFloat(averageRipeness),
+        currency,
+        lastUpdated: new Date().toISOString().split("T")[0],
+      })
+      .returning();
 
-  bananaIndex.push(newBanana);
-  res.status(201).json(newBanana);
-});
-
-app.get("/api/bananas/:id", (req, res) => {
-  const banana = bananaIndex.find((b) => b.id === parseInt(req.params.id));
-  if (!banana) {
-    return res.status(404).json({ error: "Banana not found" });
+    res.status(201).json(newBanana[0]);
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({ error: "Failed to add banana to database" });
   }
-  res.json(banana);
 });
 
-app.put("/api/bananas/:id", (req, res) => {
+app.get("/api/bananas/:id", async (req, res) => {
+  try {
+    const bananas = await db
+      .select()
+      .from(bananaIndex)
+      .where(eq(bananaIndex.id, parseInt(req.params.id)));
+
+    if (bananas.length === 0) {
+      return res.status(404).json({ error: "Banana not found" });
+    }
+    res.json(bananas[0]);
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+app.put("/api/bananas/:id", async (req, res) => {
   const { country, pricePerKg, averageRipeness, currency } = req.body;
-  const bananaIndex = bananaIndex.findIndex(
-    (b) => b.id === parseInt(req.params.id)
-  );
 
-  if (bananaIndex === -1) {
-    return res.status(404).json({ error: "Banana not found" });
+  try {
+    const updateData = {};
+    if (country) updateData.country = country;
+    if (pricePerKg) updateData.pricePerKg = parseFloat(pricePerKg);
+    if (averageRipeness)
+      updateData.averageRipeness = parseFloat(averageRipeness);
+    if (currency) updateData.currency = currency;
+    updateData.lastUpdated = new Date().toISOString().split("T")[0];
+
+    const updatedBananas = await db
+      .update(bananaIndex)
+      .set(updateData)
+      .where(eq(bananaIndex.id, parseInt(req.params.id)))
+      .returning();
+
+    if (updatedBananas.length === 0) {
+      return res.status(404).json({ error: "Banana not found" });
+    }
+
+    res.json(updatedBananas[0]);
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({ error: "Database error" });
   }
-
-  bananaIndex[bananaIndex] = {
-    ...bananaIndex[bananaIndex],
-    ...(country && { country }),
-    ...(pricePerKg && { pricePerKg: parseFloat(pricePerKg) }),
-    ...(averageRipeness && { averageRipeness: parseFloat(averageRipeness) }),
-    ...(currency && { currency }),
-    lastUpdated: new Date().toISOString().split("T")[0],
-  };
-
-  res.json(bananaIndex[bananaIndex]);
 });
 
-app.delete("/api/bananas/:id", (req, res) => {
-  const index = bananaIndex.findIndex((b) => b.id === parseInt(req.params.id));
+app.delete("/api/bananas/:id", async (req, res) => {
+  try {
+    const deletedBananas = await db
+      .delete(bananaIndex)
+      .where(eq(bananaIndex.id, parseInt(req.params.id)))
+      .returning();
 
-  if (index === -1) {
-    return res.status(404).json({ error: "Banana not found" });
+    if (deletedBananas.length === 0) {
+      return res.status(404).json({ error: "Banana not found" });
+    }
+
+    res.json(deletedBananas[0]);
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({ error: "Database error" });
   }
-
-  const deletedBanana = bananaIndex.splice(index, 1)[0];
-  res.json(deletedBanana);
 });
 
 // Serve the main page
@@ -129,7 +125,17 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🍌 Banana Index server running on http://localhost:${PORT}`);
   console.log(`📊 API available at http://localhost:${PORT}/api/bananas`);
+
+  // Test database connection on startup
+  try {
+    const result = await db.select().from(bananaIndex).limit(1);
+    console.log(
+      `✅ Connected to Neon database - Found ${result.length} banana records`
+    );
+  } catch (error) {
+    console.error(`❌ Database connection failed:`, error.message);
+  }
 });
