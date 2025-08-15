@@ -33,7 +33,7 @@ export const bananaIndex = pgTable("banana_index", {
   }).notNull(),
 
   // Currency code (optional, defaults to USD)
-  currency: varchar("currency", { length: 3 }).default("USD"),
+  currency: varchar("currency_code", { length: 3 }).default("USD"),
 
   // Last updated date (optional, defaults to current date)
   lastUpdated: date("last_updated").default("CURRENT_DATE"),
