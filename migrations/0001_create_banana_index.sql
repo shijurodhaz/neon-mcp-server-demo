@@ -7,8 +7,7 @@ CREATE TABLE IF NOT EXISTS "banana_index" (
 	"average_ripeness" decimal(3,1) NOT NULL,
 	"currency" varchar(3) DEFAULT 'USD',
 	"last_updated" date DEFAULT CURRENT_DATE,
-	"created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-	CONSTRAINT "average_ripeness_check" CHECK (average_ripeness >= 1 AND average_ripeness <= 10)
+	"created_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Insert sample data

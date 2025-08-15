@@ -132,9 +132,7 @@ app.listen(PORT, async () => {
   // Test database connection on startup
   try {
     const result = await db.select().from(bananaIndex).limit(1);
-    console.log(
-      `✅ Connected to Neon database - Found ${result.length} banana records`
-    );
+    console.log(`✅ Connected to Neon database`);
   } catch (error) {
     console.error(`❌ Database connection failed:`, error.message);
   }
