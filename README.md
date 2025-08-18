@@ -17,7 +17,7 @@ This application showcases how Neon's MCP Server can be used to:
 - **Backend**: Node.js with Express
 - **Frontend**: Vanilla JavaScript, HTML5, CSS3
 - **Database**: Neon's MCP Server (PostgreSQL)
-- **Storage**: In-memory (ready for Neon database integration)
+- **Storage**: Neon serverless PostgreSQL database
 - **Styling**: Modern CSS with gradients and animations
 
 ## Getting Started
@@ -26,6 +26,7 @@ This application showcases how Neon's MCP Server can be used to:
 
 - Node.js (version 14 or higher)
 - npm or yarn
+- A Neon database (see [DATABASE_INTEGRATION.md](./DATABASE_INTEGRATION.md) for setup)
 
 ### Installation
 
@@ -33,7 +34,7 @@ This application showcases how Neon's MCP Server can be used to:
 
 ```bash
 git clone <repository-url>
-cd banana-index
+cd neon-mcp-server-demo
 ```
 
 2. Install dependencies:
@@ -42,13 +43,21 @@ cd banana-index
 npm install
 ```
 
-3. Start the development server:
+3. Set up environment variables:
+
+Create a `.env` file in the root directory and add your Neon database connection string:
+
+```bash
+DATABASE_URL=your-neon-connection-string-here
+```
+
+4. Start the development server:
 
 ```bash
 npm run dev
 ```
 
-4. Open your browser and navigate to `http://localhost:3000`
+5. Open your browser and navigate to `http://localhost:3000`
 
 ### Production
 
@@ -62,7 +71,7 @@ npm start
 
 📖 **For detailed database integration instructions, see [DATABASE_INTEGRATION.md](./DATABASE_INTEGRATION.md)**
 
-This application is designed to integrate with Neon's serverless Postgres database using Drizzle ORM. The integration includes:
+This application is fully integrated with Neon's serverless Postgres database using Drizzle ORM. The integration includes:
 
 - **Drizzle Schema**: Type-safe database schema definition
 - **Database Configuration**: Neon connection setup
