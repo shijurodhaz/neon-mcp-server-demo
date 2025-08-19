@@ -37,6 +37,7 @@ const countryFlags = {
   Tanzania: "🇹🇿",
   Ghana: "🇬🇭",
   "Ivory Coast": "🇨🇮",
+  Netherlands: "🌧️",
 };
 
 // Initialize the application
